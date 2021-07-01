@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <meta charset="UTF-8">
+          <meta http-equiv="X-UA-Compatible" content="IE=edge">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+          <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+          <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
+
+          <title>Product Search</title>
+</head>
+<body>
+          <div id="root"></div>
+
+          <script type= "text/babel">   
+
+                    const PRODUCTS = [
+                              {
+                                        category: 'Sporting Goods', 
+                                        price: '$49.99', 
+                                        stocked: true, 
+                                        name: 'Football'
+                              },
+
+                              {
+                                        category: 'Sporting Goods', 
+                                        price: '$9.99', 
+                                        stocked: true, 
+                                        name: 'Baseball'
+                              },
+
+                              {
+                                        category: 'Sporting Goods', 
+                                        price: '$29.99', 
+                                        stocked: false, 
+                                        name: 'Basketball'
+                              },
+
+                              {
+                                        category: 'Electronics', 
+                                        price: '$99.99', 
+                                        stocked: true, 
+                                        name: 'iPod Touch'
+                              },
+
+                              {
+                                        category: 'Electronics', 
+                                        price: '$399.99', 
+                                        stocked: false, 
+                                        name: 'iPhone 5'
+                              },
+
+                              {
+                                        category: 'Electronics', 
+                                        price: '$199.99', 
+                                        stocked: true, 
+                                        name: 'Nexus 7'
+                              }
+                    ];
+
+                    class ProductCategories extends React.Component {
+                              render() { 
+                                        const category = this.props.category
+
+                                        return (  
+                                                  <tr>
+                                                            <th colSpan = '2'>
+                                                                      {category}
+                                                            </th>          
+                                                  </tr>
+                                        );
+                              }
+                    }
+
+                    class  ProductItems extends React.Component {
+                              render() { 
+                                        const product = this.props.product
+                                        const name = product.stocked
+                                                                      ? product.name
+                                                                      : <span style={{color: 'red'}}>
+                                                                                {product.name}
+                                                                      </span>
+                                        
+                                        return (
+                                                  <tr>
+                                                            <td>{name}</td>          
+                                                            <td>{product.price}</td>          
+                                                  </tr>
+                                          );
+                              }
+                    }
+
+                    class ProductDisplay extends React.Component {
+                              render() { 
+
+                                        let text = this.props.text
+                                        let stock = this.props.stock
+
+                                        let rows = [];
+                                        let lastCategory = null;
+
+                                        this.props.prodts.forEach((pro) => {
+                                                  if(pro.name.indexOf(text) === -1) {
+                                                            return
+                                                  }
+
+                                                  if(stock && !pro.stocked) {
+                                                            console.log(stock, pro.stocked);
+                                                            return 
+                                                  }
+
+                                                  if(pro.category !== lastCategory) {
+                                                            rows.push(
+                                                                      <ProductCategories 
+                                                                                category = {pro.category}
+                                                                                key = {pro.category}
+                                                                      />
+                                                            )
+                                                  }
+
+                                                  rows.push (
+                                                            <ProductItems 
+                                                                      product = {pro}
+                                                                      key = {pro.name}
+                                                            />
+                                                  )
+
+                                                  lastCategory = pro.category 
+
+                                        })
+
+                                        return ( 
+                                                  <table>
+                                                            <thead>
+                                                                      <tr>
+                                                                                <th> Name </th>
+                                                                                <th>Price</th>         
+                                                                      </tr>
+                                                            </thead>  
+                                                            
+                                                            <tbody>
+                                                                      {rows}
+                                                            </tbody>
+                                                  </table>
+                                         );
+                              }
+                    }
+
+                    class  SearchBar extends React.Component {
+                              constructor(props) {
+                                        super(props)
+                              }
+
+                              handleTextSearch = (e) => {
+                                        this.props.textOnChange(e.target.value)
+                              }
+
+                              handleInStockVal = (e) => {
+                                        this.props.stockOnChange(e.target.checked)
+                              }
+
+                              
+                              render() { 
+
+                                        return ( 
+                                                  <form>
+                                                            <input 
+                                                                      type="text"
+                                                                      placeholder="Search ..."
+                                                                      value = {this.props.text}
+                                                                      onChange = {this.handleTextSearch}
+                                                            />          
+
+                                                            <p>
+                                                                      <input 
+                                                                                type="checkbox"
+                                                                                checked = {this.props.stock}
+                                                                                onChange = {this.handleInStockVal}
+                                                                      />
+
+                                                                      Only show products in stock          
+                                                            </p>
+                                                  </form>
+                                         );
+                              }
+                    }
+                     
+                    class FinalDisplays extends React.Component {
+                              constructor(props) {
+                                        super(props);
+
+                                        this.state = {
+                                                  textInput: "",
+                                                  inStock: false
+                                        } 
+                              }
+
+                              handleText = (textInput) => {
+                                        this.setState({
+                                                  textInput
+                                        })
+                              }
+
+                              handleInStock = (inStock) => {
+                                        this.setState({
+                                                  inStock
+                                        })
+                              }
+
+                              render() { 
+                                        return ( 
+                                                  <div>
+                                                            <SearchBar 
+                                                                      text = {this.state.textInput}
+                                                                      textOnChange = {this.handleText}
+
+                                                                      stock = {this.state.inStock}
+                                                                      stockOnChange = {this.handleInStock}
+                                                            />
+
+                                                            <ProductDisplay
+                                                                      prodts = {this.props.products}
+                                                                      text = {this.state.textInput}
+                                                                      stock = {this.state.inStock}
+                                                            />
+
+                                                  </div>
+                                        );
+                              }
+                    }                     
+
+                    ReactDOM.render(
+                              <FinalDisplays products= {PRODUCTS} />,
+                              document.getElementById('root')
+                    )
+
+
+          </script>
+
+</body>
+</html>
